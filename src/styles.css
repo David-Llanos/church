@@ -1,0 +1,246 @@
+:root {
+  --canvas: #f8f2e6;
+  --ink: #2d2b2a;
+  --panel: #fff9f0;
+  --shadow: rgba(80, 43, 14, 0.18);
+  --accent: #1f6f5f;
+  --accent-alt: #c44f2b;
+  --red: #d94f42;
+  --yellow: #f2ba45;
+  --blue: #3b82d6;
+  --green: #42a774;
+  --safe: #ffe5bf;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Space Grotesk", "Segoe UI", sans-serif;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 18% 14%, rgba(242, 186, 69, 0.16), transparent 34%),
+    radial-gradient(circle at 84% 10%, rgba(31, 111, 95, 0.2), transparent 33%),
+    linear-gradient(160deg, #f7ebd4 0%, #f5e4c4 45%, #f0dbba 100%);
+}
+
+.app-shell {
+  width: min(1240px, 96vw);
+  margin: 0 auto;
+  padding: 1.4rem 0 2rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.hero {
+  text-align: center;
+  animation: rise-in 320ms ease-out;
+}
+
+.hero h1 {
+  margin: 0.1rem 0;
+  font-size: clamp(1.8rem, 2.8vw, 2.7rem);
+  font-family: "Changa", "Trebuchet MS", sans-serif;
+  letter-spacing: 0.04em;
+}
+
+.eyebrow {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 0.75rem;
+  color: #865c24;
+}
+
+.tagline {
+  margin: 0.2rem 0 0;
+}
+
+.setup-panel {
+  background: linear-gradient(120deg, rgba(255, 250, 238, 0.95), rgba(255, 242, 212, 0.96));
+  border: 1px solid rgba(143, 93, 21, 0.18);
+  border-radius: 1rem;
+  box-shadow: 0 10px 32px var(--shadow);
+  display: flex;
+  gap: 1rem;
+  align-items: end;
+  padding: 0.9rem;
+  flex-wrap: wrap;
+  animation: rise-in 420ms ease-out;
+}
+
+.control {
+  display: grid;
+  gap: 0.25rem;
+  min-width: 130px;
+}
+
+.control span {
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+select,
+button {
+  border-radius: 0.66rem;
+  border: 1px solid rgba(87, 62, 25, 0.24);
+  padding: 0.48rem 0.65rem;
+  font: inherit;
+}
+
+button {
+  background: linear-gradient(145deg, #1f6f5f, #2b917d);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  transition: transform 120ms ease, filter 120ms ease;
+}
+
+button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  filter: brightness(1.06);
+}
+
+button:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
+.game-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(300px, 2fr) minmax(260px, 1fr);
+}
+
+.board-panel,
+.info-panel {
+  background: var(--panel);
+  border-radius: 1rem;
+  border: 1px solid rgba(103, 75, 31, 0.2);
+  box-shadow: 0 10px 28px var(--shadow);
+  animation: rise-in 540ms ease-out;
+}
+
+.board-panel {
+  padding: 0.8rem;
+  min-height: 380px;
+}
+
+#board {
+  width: 100%;
+  display: block;
+  border-radius: 0.8rem;
+  background:
+    radial-gradient(circle at center, #fffbf2 0%, #f0dcc1 100%);
+}
+
+.info-panel {
+  padding: 0.8rem;
+  display: grid;
+  gap: 0.8rem;
+  align-content: start;
+}
+
+.status-block {
+  background: rgba(255, 251, 242, 0.92);
+  border-radius: 0.7rem;
+  border: 1px solid rgba(86, 60, 22, 0.13);
+  padding: 0.65rem;
+}
+
+.status-block h2 {
+  margin: 0 0 0.45rem;
+  font-size: 0.95rem;
+  font-family: "Changa", sans-serif;
+  letter-spacing: 0.03em;
+}
+
+#status,
+#dice {
+  margin: 0.2rem 0;
+}
+
+#actions,
+#bonus {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.move-button {
+  width: 100%;
+  text-align: left;
+  padding: 0.45rem 0.55rem;
+  background: linear-gradient(130deg, rgba(59, 130, 214, 0.15), rgba(66, 167, 116, 0.15));
+  color: #172f2a;
+  border: 1px solid rgba(31, 111, 95, 0.28);
+}
+
+.move-button:hover:not(:disabled) {
+  filter: brightness(1.02);
+}
+
+#log {
+  margin: 0;
+  padding: 0 0 0 1.15rem;
+  max-height: 180px;
+  overflow: auto;
+  display: grid;
+  gap: 0.2rem;
+  font-size: 0.82rem;
+}
+
+.track-cell {
+  stroke: #644d2a;
+  stroke-width: 1;
+}
+
+.track-cell.safe {
+  fill: var(--safe);
+  stroke-width: 2;
+}
+
+.track-cell.start {
+  stroke-width: 2.8;
+}
+
+.token {
+  stroke: #1f1f1f;
+  stroke-width: 1.3;
+}
+
+.player-red {
+  fill: var(--red);
+}
+
+.player-yellow {
+  fill: var(--yellow);
+}
+
+.player-blue {
+  fill: var(--blue);
+}
+
+.player-green {
+  fill: var(--green);
+}
+
+@media (max-width: 980px) {
+  .game-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Parchis Arena</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Changa:wght@400;500;700&family=Space+Grotesk:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="hero">
+        <p class="eyebrow">Classic Board Rules</p>
+        <h1>Parchis Arena</h1>
+        <p class="tagline">Roll, split dice, capture safely, and race every pawn into home.</p>
+      </header>
+
+      <section class="setup-panel" aria-label="Game setup">
+        <label class="control">
+          <span>Players</span>
+          <select id="player-count">
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4" selected>4</option>
+          </select>
+        </label>
+
+        <label class="control">
+          <span>Pieces per player</span>
+          <select id="piece-count">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4" selected>4</option>
+          </select>
+        </label>
+
+        <button id="start-game" type="button">Start New Game</button>
+      </section>
+
+      <main class="game-grid">
+        <section class="board-panel" aria-label="Parchis board">
+          <svg id="board" viewBox="0 0 720 720" role="img" aria-label="Parchis board"></svg>
+        </section>
+
+        <section class="info-panel" aria-label="Game controls and status">
+          <div class="status-block">
+            <h2>Turn</h2>
+            <p id="status"></p>
+            <p id="dice"></p>
+            <button id="roll-dice" type="button">Roll Dice</button>
+          </div>
+
+          <div class="status-block" id="actions-block">
+            <h2>Legal Moves</h2>
+            <div id="actions"></div>
+          </div>
+
+          <div class="status-block" id="bonus-block">
+            <h2>Bonus Moves</h2>
+            <div id="bonus"></div>
+          </div>
+
+          <div class="status-block">
+            <h2>Recent Log</h2>
+            <ol id="log"></ol>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
