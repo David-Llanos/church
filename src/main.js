@@ -16,6 +16,8 @@ import {
 } from "./game/constants.js";
 
 const SVG_NS = "http://www.w3.org/2000/svg";
+const BOARD_CENTER = 360;
+const DEFAULT_HOVER_INFO = "Hover a piece to inspect details.";
 
 const stateRefs = {
   playerCount: document.querySelector("#player-count"),
@@ -24,6 +26,7 @@ const stateRefs = {
   rollButton: document.querySelector("#roll-dice"),
   status: document.querySelector("#status"),
   dice: document.querySelector("#dice"),
+  hoverInfo: document.querySelector("#hover-info"),
   actions: document.querySelector("#actions"),
   bonus: document.querySelector("#bonus"),
   log: document.querySelector("#log"),
@@ -95,6 +98,27 @@ stateRefs.bonus.addEventListener("click", (event) => {
   }
 });
 
+tokenLayer.addEventListener("pointerover", (event) => {
+  const token = event.target.closest("circle.token");
+  if (!token) {
+    return;
+  }
+
+  if (stateRefs.hoverInfo) {
+    stateRefs.hoverInfo.textContent = token.dataset.hoverText || DEFAULT_HOVER_INFO;
+  }
+});
+
+tokenLayer.addEventListener("pointerout", (event) => {
+  if (!event.target.closest("circle.token")) {
+    return;
+  }
+
+  if (stateRefs.hoverInfo) {
+    stateRefs.hoverInfo.textContent = DEFAULT_HOVER_INFO;
+  }
+});
+
 window.__PARCHIS_TEST_API__ = {
   queueRandom(values) {
     if (!Array.isArray(values)) {
@@ -158,6 +182,9 @@ function renderStatus() {
   stateRefs.dice.textContent = gameState.dice
     ? `Dice: ${gameState.dice[0]} + ${gameState.dice[1]}`
     : "Dice: not rolled";
+  if (stateRefs.hoverInfo) {
+    stateRefs.hoverInfo.textContent = stateRefs.hoverInfo.textContent || DEFAULT_HOVER_INFO;
+  }
 
   stateRefs.rollButton.disabled = gameState.phase !== "await_roll";
 }
@@ -265,7 +292,7 @@ function drawBoardSkeleton() {
         createSvgElement("circle", {
           cx: coord.x,
           cy: coord.y,
-          r: 11,
+          r: 13,
           fill: "rgba(255, 255, 255, 0.65)",
           stroke: "#70512a",
           "stroke-width": 1,
@@ -276,7 +303,8 @@ function drawBoardSkeleton() {
 
   trackCoordinates.forEach((coord, index) => {
     const segmentColor = segmentShade(index);
-    const isStart = START_INDEXES.includes(index);
+    const startSlot = START_INDEXES.indexOf(index);
+    const isStart = startSlot !== -1;
 
     const classes = ["track-cell"];
     if (SAFE_TRACK_INDEXES.has(index)) {
@@ -290,21 +318,53 @@ function drawBoardSkeleton() {
       createSvgElement("circle", {
         cx: coord.x,
         cy: coord.y,
-        r: 9,
+        r: 11.5,
         class: classes.join(" "),
-        fill: isStart ? playerLightByColor[PLAYER_COLORS[START_INDEXES.indexOf(index)]] : segmentColor,
+        fill: isStart ? playerLightByColor[PLAYER_COLORS[startSlot]] : segmentColor,
       }),
     );
+
+    if (isStart) {
+      const labelPosition = getRadialLabelPosition(coord, 28);
+      staticLayer.append(
+        createSvgText(
+          {
+            x: labelPosition.x,
+            y: labelPosition.y,
+            class: "board-label start-label",
+            "text-anchor": "middle",
+            "dominant-baseline": "middle",
+          },
+          `START P${startSlot + 1}`,
+        ),
+      );
+    }
 
     if (SAFE_TRACK_INDEXES.has(index)) {
       staticLayer.append(
         createSvgElement("circle", {
           cx: coord.x,
           cy: coord.y,
-          r: 2.4,
+          r: 2.8,
           fill: "#764a1f",
         }),
       );
+
+      if (!isStart) {
+        const labelPosition = getRadialLabelPosition(coord, 22);
+        staticLayer.append(
+          createSvgText(
+            {
+              x: labelPosition.x,
+              y: labelPosition.y,
+              class: "board-label safe-label",
+              "text-anchor": "middle",
+              "dominant-baseline": "middle",
+            },
+            "SAFE",
+          ),
+        );
+      }
     }
   });
 
@@ -314,7 +374,7 @@ function drawBoardSkeleton() {
         createSvgElement("circle", {
           cx: coord.x,
           cy: coord.y,
-          r: 10,
+          r: 11.2,
           fill: laneIndex === HOME_LENGTH - 1 ? "#fff4dc" : playerLightByColor[color],
           stroke: "#6f4d1d",
           "stroke-width": 1.4,
@@ -377,17 +437,39 @@ function renderTokens() {
 
   grouped.forEach((entries) => {
     entries.forEach((entry, index) => {
-      const offset = stackOffset(index);
+      const offset = stackOffset(index, entries.length);
       const player = gameState.players[entry.piece.playerIndex];
+      const tokenX = entry.coord.x + offset.x;
+      const tokenY = entry.coord.y + offset.y;
+      const hoverSummary = buildPieceHoverSummary(entry.piece, player);
+      const hoverDetails = buildPieceHoverDetails(entry.piece, player);
+      const token = createSvgElement("circle", {
+        cx: tokenX,
+        cy: tokenY,
+        r: 10.5,
+        class: `token ${playerCssClassByColor[player.color]}`,
+        "data-player": entry.piece.playerIndex,
+        "data-piece-id": entry.piece.pieceId,
+        "data-hover-text": hoverSummary,
+      });
+      token.setAttribute("aria-label", hoverSummary);
+      token.append(createSvgTitle(hoverDetails));
+
       tokenLayer.append(
-        createSvgElement("circle", {
-          cx: entry.coord.x + offset.x,
-          cy: entry.coord.y + offset.y,
-          r: 8.6,
-          class: `token ${playerCssClassByColor[player.color]}`,
-          "data-player": entry.piece.playerIndex,
-          "data-piece-id": entry.piece.pieceId,
-        }),
+        token,
+      );
+
+      tokenLayer.append(
+        createSvgText(
+          {
+            x: tokenX,
+            y: tokenY,
+            class: "token-label",
+            "text-anchor": "middle",
+            "dominant-baseline": "middle",
+          },
+          `${entry.piece.playerIndex + 1}-${entry.piece.slot + 1}`,
+        ),
       );
     });
   });
@@ -409,16 +491,18 @@ function resolvePieceCoordinate(pieceData) {
   return nestCoordinates[pieceData.playerIndex][pieceData.slot];
 }
 
-function stackOffset(index) {
-  const offsets = [
-    { x: 0, y: 0 },
-    { x: 10, y: 0 },
-    { x: -10, y: 0 },
-    { x: 0, y: 10 },
-    { x: 0, y: -10 },
-  ];
+function stackOffset(index, stackSize) {
+  if (stackSize <= 1) {
+    return { x: 0, y: 0 };
+  }
 
-  return offsets[index] || { x: (index % 3) * 7, y: Math.floor(index / 3) * 7 };
+  const angle = -Math.PI / 2 + (2 * Math.PI * index) / stackSize;
+  const radius = 10 + Math.min(stackSize, 8) * 1.9;
+
+  return {
+    x: Math.cos(angle) * radius,
+    y: Math.sin(angle) * radius,
+  };
 }
 
 function describePhase(phase) {
@@ -454,22 +538,68 @@ function createSvgElement(tag, attributes) {
   return element;
 }
 
+function createSvgText(attributes, text) {
+  const element = createSvgElement("text", attributes);
+  element.textContent = text;
+  return element;
+}
+
+function createSvgTitle(text) {
+  const title = createSvgElement("title", {});
+  title.textContent = text;
+  return title;
+}
+
+function buildPieceHoverSummary(pieceData, player) {
+  return `P${pieceData.playerIndex + 1} ${player.color} | Piece ${pieceData.slot + 1} | ${describePieceLocation(pieceData)}`;
+}
+
+function buildPieceHoverDetails(pieceData, player) {
+  const location = describePieceLocation(pieceData);
+  return `Player ${pieceData.playerIndex + 1} (${player.color})\nPiece ${pieceData.slot + 1}\n${location}`;
+}
+
+function describePieceLocation(pieceData) {
+  if (pieceData.zone === "track") {
+    return `Track space ${pieceData.trackIndex + 1}`;
+  }
+
+  if (pieceData.zone === "home_lane") {
+    return `Home lane ${pieceData.laneIndex + 1}/${HOME_LENGTH}`;
+  }
+
+  if (pieceData.zone === "home") {
+    return "In home triangle";
+  }
+
+  return "In nest";
+}
+
+function getRadialLabelPosition(coord, distance) {
+  const vectorX = coord.x - BOARD_CENTER;
+  const vectorY = coord.y - BOARD_CENTER;
+  const vectorSize = Math.hypot(vectorX, vectorY) || 1;
+
+  return {
+    x: coord.x + (vectorX / vectorSize) * distance,
+    y: coord.y + (vectorY / vectorSize) * distance,
+  };
+}
+
 function buildTrackCoordinates() {
-  const center = 360;
   const radius = 282;
 
   return Array.from({ length: TRACK_LENGTH }).map((_, index) => {
     const angle = -Math.PI / 2 + (2 * Math.PI * index) / TRACK_LENGTH;
 
     return {
-      x: center + Math.cos(angle) * radius,
-      y: center + Math.sin(angle) * radius,
+      x: BOARD_CENTER + Math.cos(angle) * radius,
+      y: BOARD_CENTER + Math.sin(angle) * radius,
     };
   });
 }
 
 function buildLaneCoordinates() {
-  const center = 360;
   const outerRadius = 230;
   const innerRadius = 84;
 
@@ -481,8 +611,8 @@ function buildLaneCoordinates() {
       const radius = outerRadius - (outerRadius - innerRadius) * t;
 
       return {
-        x: center + Math.cos(angle) * radius,
-        y: center + Math.sin(angle) * radius,
+        x: BOARD_CENTER + Math.cos(angle) * radius,
+        y: BOARD_CENTER + Math.sin(angle) * radius,
       };
     });
   });
