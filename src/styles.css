@@ -84,6 +84,7 @@ body {
 }
 
 select,
+input,
 button {
   border-radius: 0.66rem;
   border: 1px solid rgba(87, 62, 25, 0.24);
@@ -163,6 +164,60 @@ button:disabled {
   margin: 0.2rem 0;
   font-size: 0.96rem;
   font-weight: 600;
+}
+
+#online-status {
+  margin: 0.2rem 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+#socket-endpoint {
+  margin: 0 0 0.55rem;
+  font-size: 0.78rem;
+  color: #654a1c;
+  word-break: break-all;
+}
+
+.lobby-control {
+  margin-bottom: 0.45rem;
+}
+
+.lobby-control input {
+  width: 100%;
+}
+
+.lobby-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.35rem;
+  margin-bottom: 0.45rem;
+}
+
+#room-details {
+  margin: 0.2rem 0 0.45rem;
+  font-size: 0.84rem;
+}
+
+#room-list {
+  margin: 0;
+  padding: 0 0 0 1rem;
+  display: grid;
+  gap: 0.3rem;
+  max-height: 120px;
+  overflow: auto;
+  font-size: 0.86rem;
+}
+
+.lobby-room-button {
+  width: 100%;
+  text-align: left;
+  padding: 0.38rem 0.5rem;
+  background: linear-gradient(120deg, rgba(196, 79, 43, 0.14), rgba(31, 111, 95, 0.12));
+  color: #342108;
+  border: 1px solid rgba(114, 74, 24, 0.24);
+  font-size: 0.82rem;
+  line-height: 1.2;
 }
 
 #hover-info {
@@ -276,6 +331,12 @@ button:disabled {
 
 @media (max-width: 980px) {
   .game-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .lobby-actions {
     grid-template-columns: 1fr;
   }
 }
