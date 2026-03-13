@@ -50,6 +50,33 @@
 
         <section class="info-panel" aria-label="Game controls and status">
           <div class="status-block">
+            <h2>Online Lobby</h2>
+            <p id="online-status">Status: not connected</p>
+            <p id="socket-endpoint"></p>
+
+            <label class="control lobby-control">
+              <span>Player name</span>
+              <input id="player-name" type="text" maxlength="24" placeholder="Player name" />
+            </label>
+
+            <label class="control lobby-control">
+              <span>Room ID</span>
+              <input id="room-id" type="text" maxlength="16" placeholder="e.g. ABC123" />
+            </label>
+
+            <div class="lobby-actions">
+              <button id="connect-online" type="button">Connect</button>
+              <button id="refresh-rooms" type="button">Refresh</button>
+              <button id="create-room" type="button">Create Room</button>
+              <button id="join-room" type="button">Join Room</button>
+              <button id="leave-room" type="button">Leave Room</button>
+            </div>
+
+            <p id="room-details">Current room: none</p>
+            <ul id="room-list" aria-label="Open rooms"></ul>
+          </div>
+
+          <div class="status-block">
             <h2>Turn</h2>
             <p id="status"></p>
             <p id="dice"></p>
